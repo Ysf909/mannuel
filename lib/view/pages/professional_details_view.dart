@@ -36,8 +36,9 @@ class _ProfessionalDetailsPageState extends State<ProfessionalDetailsPage> {
   List<AppType> _jobTypes = [];
   List<AppType> _locations = [];
 
-  AppType? _selectedTitle;
-  AppType? _selectedJobTitle;
+int? _selectedTitleId;
+int? _selectedJobTitleId;
+
 
   final Set<int> _selectedJobTypeIds = {};
   final Set<int> _selectedLocationIds = {};
@@ -93,7 +94,8 @@ class _ProfessionalDetailsPageState extends State<ProfessionalDetailsPage> {
   }
 
   Future<void> _submit() async {
-    if (_selectedTitle == null || _selectedJobTitle == null) {
+    if (_selectedTitleId == null || _selectedJobTitleId == null) {
+
       setState(() => _error = "Please select Professional Title and Job Title.");
       return;
     }
@@ -101,33 +103,22 @@ class _ProfessionalDetailsPageState extends State<ProfessionalDetailsPage> {
       setState(() => _error = "Please select at least one Job Type.");
       return;
     }
-    if (_selectedLocationIds.isEmpty) {
-      setState(() => _error = "Please select at least one Location.");
-      return;
-    }
-
-    setState(() {
+setState(() {
       _error = null;
       _loading = true;
     });
 
     try {
-     await widget.repo.registerProfessionalInfos(
-  professionalTitle: _selectedTitle!.id,
-
-  // ✅ send job title as list
-  preferedJobTitles: [_selectedJobTitle!.id],
-
+   await widget.repo.registerProfessionalInfos(
+  professionalTitle: _selectedTitleId!,
+  preferedJobTitles: [
+    _jobTitles.firstWhere((e) => e.id == _selectedJobTitleId!).value
+  ],
   preferedJobTypes: _selectedJobTypeIds.toList(),
-
-  // ✅ rename to preferedLocations
-  preferedLocations: _selectedLocationIds.toList(),
-
   accessToken: widget.accessToken,
 );
 
-
-      if (!mounted) return;
+if (!mounted) return;
       setState(() => _loading = false);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -244,23 +235,31 @@ class _ProfessionalDetailsPageState extends State<ProfessionalDetailsPage> {
                                 const SizedBox(height: 6),
 
                                 // Professional Title
-                                _DropField<AppType>(
-                                  label: "Professional Title",
-                                  value: _selectedTitle,
-                                  items: _titles,
-                                  getLabel: (t) => t.value,
-                                  onChanged: (v) => setState(() => _selectedTitle = v),
-                                ),
-                                const SizedBox(height: 14),
+                                _DropField(
+                                label: "Professional Title",
+                                value: (_selectedTitleId != null && _titles.any((e) => e.id == _selectedTitleId))
+                                    ? _selectedTitleId
+                                    : null,
+                                items: _titles,
+                                getLabel: (t) => t.value,
+                                getId: (t) => t.id,
+                                onChanged: (id) => setState(() => _selectedTitleId = id),
+                              ),
+
+                              const SizedBox(height: 14),
 
                                 // Job Title
-                                _DropField<AppType>(
-                                  label: "Job Title",
-                                  value: _selectedJobTitle,
-                                  items: _jobTitles,
-                                  getLabel: (t) => t.value,
-                                  onChanged: (v) => setState(() => _selectedJobTitle = v),
-                                ),
+                                _DropField(
+                                label: "Job Title",
+                                value: (_selectedJobTitleId != null && _jobTitles.any((e) => e.id == _selectedJobTitleId))      
+                                    ? _selectedJobTitleId
+                                    : null,
+                                items: _jobTitles,
+                                getLabel: (t) => t.value,
+                                getId: (t) => t.id,
+                                onChanged: (id) => setState(() => _selectedJobTitleId = id),
+                              ),
+
                                 const SizedBox(height: 14),
 
                                 // Bio
@@ -434,14 +433,16 @@ class _DropField<T> extends StatelessWidget {
     required this.value,
     required this.items,
     required this.getLabel,
+    required this.getId,
     required this.onChanged,
   });
 
   final String label;
-  final T? value;
+  final int? value; // ✅ id
   final List<T> items;
   final String Function(T) getLabel;
-  final ValueChanged<T?> onChanged;
+  final int Function(T) getId;
+  final ValueChanged<int?> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -452,26 +453,22 @@ class _DropField<T> extends StatelessWidget {
         color: HutopiaTheme.fieldBg,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<T>(
-                value: value,
-                isExpanded: true,
-                hint: Text(label, style: const TextStyle(fontSize: 13, color: HutopiaTheme.hint)),
-                icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                items: items
-                    .map((t) => DropdownMenuItem<T>(
-                          value: t,
-                          child: Text(getLabel(t), style: const TextStyle(fontSize: 13)),
-                        ))
-                    .toList(),
-                onChanged: onChanged,
-              ),
-            ),
-          ),
-        ],
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: value,
+          isExpanded: true,
+          hint: Text(label, style: const TextStyle(fontSize: 13, color: HutopiaTheme.hint)),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded),
+          items: items
+              .map(
+                (t) => DropdownMenuItem<int>(
+                  value: getId(t),
+                  child: Text(getLabel(t), style: const TextStyle(fontSize: 13)),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
+        ),
       ),
     );
   }

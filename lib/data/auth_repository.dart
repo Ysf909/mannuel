@@ -51,9 +51,8 @@ abstract class AuthRepository {
   // Step 4
   Future<void> registerProfessionalInfos({
   required int professionalTitle,
-  required List<int> preferedJobTitles,
+  required List<String> preferedJobTitles,
   required List<int> preferedJobTypes,
-  required List<int> preferedLocations,
   required String accessToken,
 });
 
@@ -298,12 +297,11 @@ Future<List<HomeSection>> getHomeSections({
   }
 
   // ================= STEP 4 =================
-  @override
+@override
 Future<void> registerProfessionalInfos({
   required int professionalTitle,
-  required List<int> preferedJobTitles,
+  required List<String> preferedJobTitles, // ✅ strings
   required List<int> preferedJobTypes,
-  required List<int> preferedLocations,
   required String accessToken,
 }) async {
   final token = accessToken.trim();
@@ -312,13 +310,13 @@ Future<void> registerProfessionalInfos({
     "api/auth/RegisterProfessionalInfos",
     {
       "professionalTitle": professionalTitle,
-      "preferedJobTitles": preferedJobTitles,
-      "preferedJobTypes": preferedJobTypes,
-      "preferedLocations": preferedLocations,
+      "preferedJobTitles": jsonEncode(preferedJobTitles.map((e) => e.trim()).where((e) => e.isNotEmpty).toList()), // ✅ list<string>
+      "preferedJobTypes": jsonEncode(preferedJobTypes),   // ✅ list<int>
     },
     extraHeaders: {"Authorization": "Bearer $token"},
   );
 }
+
 
   
 
@@ -386,3 +384,7 @@ Future<void> registerProfessionalInfos({
     return items.map((e) => AppValueModel.fromJson(e)).toList();
   }
 }
+
+
+
+

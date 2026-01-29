@@ -111,20 +111,22 @@ bool isLoading = true;
   if (preferredJobTypes.isEmpty) {
     throw Exception("Please select at least one job type");
   }
+final jobTitleObj = jobTitles.firstWhere(
+    (t) => t.id == professionalJobTitle!,
+    orElse: () => throw Exception("Job title not found in loaded list."),
+  );
 
-  // If not remote-only, require at least one location
-  if (!isRemoteOnly && preferredJobLocations.isEmpty) {
-    throw Exception("Please select at least one location");
-  }
+final jobTitleValue = jobTitleObj.value.trim();
+if (jobTitleValue.isEmpty) {
+  throw Exception("Invalid job title value.");
+}
 
   await repo.registerProfessionalInfos(
-    professionalTitle: professionalTitle!,                 // ✅ int
-    preferedJobTitles: [professionalJobTitle!],            // ✅ list<int>
-    preferedJobTypes: List<int>.from(preferredJobTypes),   // ✅ list<int>
-    preferedLocations: isRemoteOnly
-        ? <int>[]                                          // ✅ remote-only: send empty list
-        : List<int>.from(preferredJobLocations),           // ✅ list<int>
-    accessToken: accessToken,
-  );
+  professionalTitle: professionalTitle!,
+  preferedJobTitles: [jobTitleValue], // ✅ string
+  preferedJobTypes: List<int>.from(preferredJobTypes),
+  accessToken: accessToken,
+);
+
 }
 }
