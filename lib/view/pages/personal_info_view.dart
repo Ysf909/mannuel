@@ -10,12 +10,22 @@ import '../widgets/hutopia_primary_button.dart';
 
 class PersonalInfoView extends StatelessWidget {
   final String email;
-  const PersonalInfoView({super.key, required this.email});
+  final String accessToken;
+
+  const PersonalInfoView({
+    super.key,
+    required this.email,
+    required this.accessToken,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => PersonalInfoViewModel(context.read<AuthRepository>(), email: email),
+      create: (_) => PersonalInfoViewModel(
+        context.read<AuthRepository>(),
+        email: email,
+        accessToken: accessToken,
+      ),
       child: const _PersonalInfoBody(),
     );
   }
@@ -43,42 +53,6 @@ class _PersonalInfoBody extends StatelessWidget {
                 ),
               ),
 
-              // Progress bar 25%
-              Positioned(
-                top: 80,
-                left: HutopiaTheme.sidePad,
-                right: HutopiaTheme.sidePad,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('25%', style: TextStyle(fontSize: 11, color: HutopiaTheme.body)),
-                    const SizedBox(height: 6),
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: LinearProgressIndicator(
-                        value: 0.25,
-                        minHeight: 6,
-                        backgroundColor: const Color(0xFFE5E7EB),
-                        valueColor: const AlwaysStoppedAnimation(HutopiaTheme.primary),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Positioned(
-                top: 140,
-                left: HutopiaTheme.sidePad,
-                right: HutopiaTheme.sidePad,
-                child: Text(
-                  'Personal Info',
-                  style: TextStyle(
-                    fontSize: 28,
-                    color: HutopiaTheme.title,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
               const Positioned(
                 top: 185,
                 left: HutopiaTheme.sidePad,
@@ -89,39 +63,8 @@ class _PersonalInfoBody extends StatelessWidget {
                 ),
               ),
 
-              // Upload picture
               Positioned(
-                top: 260,
-                left: 0,
-                right: 0,
-                child: Column(
-                  children: [
-                    InkWell(
-                      onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Upload picture (UI only)')),
-                      ),
-                      borderRadius: BorderRadius.circular(60),
-                      child: Container(
-                        width: 70,
-                        height: 70,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: HutopiaTheme.primary, width: 1.5),
-                        ),
-                        child: const Icon(Icons.person_outline, color: HutopiaTheme.primary, size: 30),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Upload Picture',
-                      style: TextStyle(fontSize: 12, color: HutopiaTheme.primary, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-
-              Positioned(
-                top: 360,
+                top: 250,
                 left: HutopiaTheme.sidePad,
                 child: HutopiaTextField(
                   width: HutopiaTheme.fieldW,
@@ -131,7 +74,7 @@ class _PersonalInfoBody extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: 436,
+                top: 326,
                 left: HutopiaTheme.sidePad,
                 child: HutopiaTextField(
                   width: HutopiaTheme.fieldW,
@@ -141,9 +84,8 @@ class _PersonalInfoBody extends StatelessWidget {
                 ),
               ),
 
-              // Date dropdown row
               Positioned(
-                top: 512,
+                top: 402,
                 left: HutopiaTheme.sidePad,
                 child: SizedBox(
                   width: HutopiaTheme.fieldW,
@@ -161,19 +103,19 @@ class _PersonalInfoBody extends StatelessWidget {
               ),
 
               const Positioned(
-                top: 585,
+                top: 472,
                 left: HutopiaTheme.sidePad,
                 child: Text('Birth date', style: TextStyle(fontSize: 12, color: HutopiaTheme.body)),
               ),
 
               const Positioned(
-                top: 630,
+                top: 517,
                 left: HutopiaTheme.sidePad,
                 child: Text('Gender', style: TextStyle(fontSize: 12, color: HutopiaTheme.body)),
               ),
 
               Positioned(
-                top: 655,
+                top: 542,
                 left: HutopiaTheme.sidePad,
                 child: Row(
                   children: [
@@ -194,7 +136,7 @@ class _PersonalInfoBody extends StatelessWidget {
 
               if (vm.errorText != null)
                 Positioned(
-                  top: 705,
+                  top: 595,
                   left: HutopiaTheme.sidePad,
                   right: HutopiaTheme.sidePad,
                   child: Text(
@@ -204,7 +146,7 @@ class _PersonalInfoBody extends StatelessWidget {
                 ),
 
               Positioned(
-                top: 760,
+                top: 645,
                 left: HutopiaTheme.sidePad,
                 child: vm.isLoading
                     ? const SizedBox(

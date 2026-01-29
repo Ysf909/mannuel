@@ -102,29 +102,29 @@ bool isLoading = true;
   }
 
   Future<void> submit() async {
-    if (professionalTitle == null) {
-      throw Exception("Please select professional title");
-    }
-    if (professionalJobTitle == null) {
-      throw Exception("Please select job title");
-    }
-    if (preferredJobTypes.isEmpty) {
-      throw Exception("Please select at least one job type");
-    }
-
-    // If not remote-only, require at least one location
-    if (!isRemoteOnly && preferredJobLocations.isEmpty) {
-      throw Exception("Please select at least one location");
-    }
-
-    await repo.registerProfessionalInfos(
-      professionalTitle: professionalTitle!,
-      professionalJobTitle: professionalJobTitle!,
-      preferedJobTypes: preferredJobTypes,
-      preferedJobLocations: preferredJobLocations,
-      accessToken: accessToken,
-    );
+  if (professionalTitle == null) {
+    throw Exception("Please select professional title");
   }
+  if (professionalJobTitle == null) {
+    throw Exception("Please select job title");
+  }
+  if (preferredJobTypes.isEmpty) {
+    throw Exception("Please select at least one job type");
+  }
+
+  // If not remote-only, require at least one location
+  if (!isRemoteOnly && preferredJobLocations.isEmpty) {
+    throw Exception("Please select at least one location");
+  }
+
+  await repo.registerProfessionalInfos(
+    professionalTitle: professionalTitle!,                 // ✅ int
+    preferedJobTitles: [professionalJobTitle!],            // ✅ list<int>
+    preferedJobTypes: List<int>.from(preferredJobTypes),   // ✅ list<int>
+    preferedLocations: isRemoteOnly
+        ? <int>[]                                          // ✅ remote-only: send empty list
+        : List<int>.from(preferredJobLocations),           // ✅ list<int>
+    accessToken: accessToken,
+  );
 }
-
-
+}

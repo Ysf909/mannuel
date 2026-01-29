@@ -79,7 +79,7 @@ Future<void> submit(BuildContext context) async {
       await _repo.signIn(email: email, password: pass);
       if (!context.mounted) return;
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeView()),
+        MaterialPageRoute(builder: (_) => const HomeView(accessToken: '',)),
       );
     } else {
       await _repo.signUp(email: email, password: pass);

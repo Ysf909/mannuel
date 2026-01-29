@@ -33,21 +33,26 @@ class OtpViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repo.verifyOtp(email: email, otp: otp);
+      final token = await _repo.verifyOtp(email: email, otp: otp);
 
       if (!context.mounted) return;
 
       if (purpose == OtpPurpose.signUp) {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => PersonalInfoView(email: email)),
+          MaterialPageRoute(
+            builder: (_) => PersonalInfoView(
+              email: email,
+              accessToken: token,
+            ),
+          ),
         );
       } else {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (_) => ResetPasswordView(email: email)),
         );
       }
-    } catch (_) {
-      errorText = 'Invalid code. Try again.';
+    } catch (e) {
+      errorText = (e is AuthException) ? e.message : 'Invalid code. Try again.';
     } finally {
       isLoading = false;
       if (context.mounted) notifyListeners();

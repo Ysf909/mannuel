@@ -54,7 +54,7 @@ class VerifiedView extends StatelessWidget {
                   height: HutopiaTheme.btnH,
                   text: 'Go Home',
                   onPressed: () => Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (_) => const HomeView()),
+                    MaterialPageRoute(builder: (_) => const HomeView(accessToken: '',)),
                     (route) => false,
                   ),
                 ),
